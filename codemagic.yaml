@@ -12,15 +12,13 @@ workflows:
         XCODE_SCHEME: MeloPlayerClone
         XCARCHIVE_PATH: build/ios/xcarchive/MeloPlayerClone.xcarchive
     scripts:
-      - name: Fix pbxproj plist syntax
+      - name: Regenerate clean pbxproj
         script: |
           set -e
-          PBX="$CM_BUILD_DIR/$XCODE_PROJECT/project.pbxproj"
-          sed -i '' 's/\r//g' "$PBX"
-          sed -i '' 's/GCC_PREPROCESSOR_DEFINITIONS = DEBUG=1 $(inherited);/GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1 $(inherited)";/' "$PBX"
-          sed -i '' 's/INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight;/INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";/' "$PBX"
-          sed -i '' 's/INFOPLIST_KEY_NSHumanReadableCopyright = ;/INFOPLIST_KEY_NSHumanReadableCopyright = "";/' "$PBX"
-          echo '[OK] pbxproj patched'
+          cd "$CM_BUILD_DIR"
+          python3 Resources/generate_xcodeproj.py
+          plutil -lint "$XCODE_PROJECT/project.pbxproj"
+          echo '[OK] pbxproj regenerated and validated'
       - name: Archive without code signing
         script: |
           set -e
