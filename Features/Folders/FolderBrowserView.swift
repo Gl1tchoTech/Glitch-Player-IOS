@@ -45,9 +45,9 @@ struct FolderBrowserView: View {
                                         id: item.id,
                                         name: item.name,
                                         durationMs: 0,
-                                        source: "local",
                                         fileURL: item.url.absoluteString,
-                                        isDownloaded: true
+                                        isDownloaded: true,
+                                        source: "local"
                                     )
                                     player.play(track: track, queue: [track])
                                 }

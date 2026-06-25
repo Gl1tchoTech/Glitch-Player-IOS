@@ -44,7 +44,7 @@ struct AudiusSearchView: View {
                     LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                         // Tracks
                         if !results.tracks.isEmpty {
-                            SearchResultSection(title: "Tracks", results.tracks.count) {
+                            SearchResultSection(title: "Tracks", count: results.tracks.count) {
                                 ForEach(results.tracks) { apiTrack in
                                     TrackRowView(track: apiTrack.toTrack(), onTap: {
                                         let tracks = results.tracks.map { $0.toTrack() }
@@ -57,7 +57,7 @@ struct AudiusSearchView: View {
                         
                         // Albums
                         if !results.albums.isEmpty {
-                            SearchResultSection(title: "Albums", results.albums.count) {
+                            SearchResultSection(title: "Albums", count: results.albums.count) {
                                 ForEach(results.albums) { album in
                                     SearchAlbumRow(album: album)
                                 }
@@ -66,7 +66,7 @@ struct AudiusSearchView: View {
                         
                         // Artists
                         if !results.artists.isEmpty {
-                            SearchResultSection(title: "Artists", results.artists.count) {
+                            SearchResultSection(title: "Artists", count: results.artists.count) {
                                 ForEach(results.artists) { artist in
                                     SearchArtistRow(artist: artist)
                                 }
@@ -75,7 +75,7 @@ struct AudiusSearchView: View {
                         
                         // Playlists
                         if !results.playlists.isEmpty {
-                            SearchResultSection(title: "Playlists", results.playlists.count) {
+                            SearchResultSection(title: "Playlists", count: results.playlists.count) {
                                 ForEach(results.playlists) { playlist in
                                     SearchPlaylistRow(playlist: playlist)
                                 }

@@ -1,5 +1,5 @@
 import SwiftUI
-import MediaPlayer
+import AVKit
 
 struct AirPlayRouteButton: UIViewRepresentable {
     func makeUIView(context: Context) -> AVRoutePickerView {

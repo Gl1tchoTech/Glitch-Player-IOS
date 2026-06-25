@@ -38,7 +38,7 @@ struct QueueView: View {
                         }
                         .onMove { source, destination in
                             let queueIdx = player.queueIndex + 1
-                            var adjustedFrom = source.first!
+                            let adjustedFrom = source.first!
                             var adjustedTo = destination
                             if adjustedTo > source.first! { adjustedTo -= 1 }
                             

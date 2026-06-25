@@ -169,18 +169,27 @@ struct NowPlayingView: View {
                 Spacer()
             }
         }
-        .sheet(isPresented: $player.showingQueueSheet) {
+        .sheet(isPresented: Binding(
+            get: { player.showingQueueSheet },
+            set: { player.showingQueueSheet = $0 }
+        )) {
             QueueView()
                 .environment(player)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $player.showingEqualizerSheet) {
+        .sheet(isPresented: Binding(
+            get: { player.showingEqualizerSheet },
+            set: { player.showingEqualizerSheet = $0 }
+        )) {
             EqualizerView()
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $player.showingSleepTimerSheet) {
+        .sheet(isPresented: Binding(
+            get: { player.showingSleepTimerSheet },
+            set: { player.showingSleepTimerSheet = $0 }
+        )) {
             SleepTimerSheet()
                 .presentationDetents([.height(250)])
                 .presentationDragIndicator(.visible)

@@ -21,7 +21,9 @@ final class GlitchiAPIClient {
     // MARK: - Health
     
     func healthCheck() async throws -> Bool {
-        let data = try await get("/health")
+        let url = URL(string: "\(baseURL)/health")!
+        let (data, response) = try await session.data(from: url)
+        try validateResponse(response)
         return !data.isEmpty
     }
     

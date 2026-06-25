@@ -1,5 +1,7 @@
 import MediaPlayer
+import Observation
 
+@Observable
 final class RemoteCommandManager {
     
     static let shared = RemoteCommandManager()

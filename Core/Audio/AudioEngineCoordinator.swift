@@ -69,9 +69,9 @@ final class AudioEngineCoordinator {
             let file = try AVAudioFile(forReading: url)
             self.audioFile = file
             self.duration = Double(file.length) / file.fileFormat.sampleRate
-            self.playerNode.scheduleFile(file, at: nil)
+            try await self.playerNode.scheduleFile(file, at: nil)
             
-        case .remoteStream(let url):
+        case .remoteStream:
             guard let streamURL = source.url else { throw AudioError.invalidSource }
             let (data, _) = try await URLSession.shared.data(from: streamURL)
             let tempURL = FileManager.default.temporaryDirectory
@@ -80,7 +80,7 @@ final class AudioEngineCoordinator {
             let file = try AVAudioFile(forReading: tempURL)
             self.audioFile = file
             self.duration = Double(file.length) / file.fileFormat.sampleRate
-            self.playerNode.scheduleFile(file, at: nil)
+            try await self.playerNode.scheduleFile(file, at: nil)
 
         case .apiStream, .apiPreview:
             guard let streamURL = source.url else { throw AudioError.invalidSource }
@@ -91,7 +91,7 @@ final class AudioEngineCoordinator {
             let file = try AVAudioFile(forReading: tempURL)
             self.audioFile = file
             self.duration = Double(file.length) / file.fileFormat.sampleRate
-            self.playerNode.scheduleFile(file, at: nil)
+            try await self.playerNode.scheduleFile(file, at: nil)
         }
     }
     
@@ -191,7 +191,7 @@ final class AudioEngineCoordinator {
             }
             
             // Schedule the file on the next node (ready to play when switched)
-            nextNode.scheduleFile(file, at: nil)
+            try await nextNode.scheduleFile(file, at: nil)
             nextAudioFile = file
             nextPlayerNode = nextNode
             isSchedulingNext = true
