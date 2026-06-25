@@ -487,9 +487,9 @@ main_debug_settings = {
     "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": '"UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"',
     "MARKETING_VERSION": "1.0",
     "PRODUCT_BUNDLE_IDENTIFIER": "com.meloplayer.app",
-    "PRODUCT_NAME": "$(TARGET_NAME)",
+    "PRODUCT_NAME": '"$(TARGET_NAME)"',
     "SWIFT_EMIT_LOC_STRINGS": "YES",
-    "TARGETED_DEVICE_FAMILY": "1,2",
+    "TARGETED_DEVICE_FAMILY": '"1,2"',
     "INFOPLIST_FILE": "Resources/Info.plist",
 }
 lines.append(pbx_config(main_debug, "Debug", main_debug_settings))
@@ -507,10 +507,10 @@ widget_debug_settings = {
     "INFOPLIST_KEY_NSHumanReadableCopyright": '""',
     "MARKETING_VERSION": "1.0",
     "PRODUCT_BUNDLE_IDENTIFIER": "com.meloplayer.app.widget",
-    "PRODUCT_NAME": "$(TARGET_NAME)",
+    "PRODUCT_NAME": '"$(TARGET_NAME)"',
     "SKIP_INSTALL": "YES",
     "SWIFT_EMIT_LOC_STRINGS": "YES",
-    "TARGETED_DEVICE_FAMILY": "1,2",
+    "TARGETED_DEVICE_FAMILY": '"1,2"',
 }
 lines.append(pbx_config(widget_debug, "Debug", widget_debug_settings))
 
