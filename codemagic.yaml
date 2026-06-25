@@ -11,7 +11,7 @@ workflows:
         distribution_type: ad_hoc
         bundle_identifier: com.meloplayer.app
       vars:
-        XCODE_PROJECT: MeloPlayerClone/MeloPlayerClone.xcodeproj
+        XCODE_PROJECT: MeloPlayerClone.xcodeproj
         XCODE_SCHEME: MeloPlayerClone
     scripts:
       - name: Set up provisioning profiles
@@ -44,7 +44,7 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.meloplayer.app
       vars:
-        XCODE_PROJECT: MeloPlayerClone/MeloPlayerClone.xcodeproj
+        XCODE_PROJECT: MeloPlayerClone.xcodeproj
         XCODE_SCHEME: MeloPlayerClone
     scripts:
       - name: Set up provisioning profiles
