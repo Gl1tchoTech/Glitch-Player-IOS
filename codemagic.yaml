@@ -42,6 +42,8 @@ workflows:
               <string>debugging</string>
               <key>signingStyle</key>
               <string>manual</string>
+              <key>teamID</key>
+              <string></string>
           </dict>
           </plist>
           PLIST
@@ -53,7 +55,8 @@ workflows:
             -archivePath "$CM_BUILD_DIR/$XCARCHIVE_PATH" \
             -exportOptionsPlist "$CM_BUILD_DIR/exportOptions.plist" \
             -exportPath "$CM_BUILD_DIR/build/ios/ipa" \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM=""
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
