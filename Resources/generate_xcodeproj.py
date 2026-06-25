@@ -298,12 +298,14 @@ def pbx_config(config_id, name, settings, isa="XCBuildConfiguration"):
 # ── Assemble PBXProj ────────────────────────────────────────────────
 
 lines = []
-lines.append("// !$*UTF8*$!")
+# NOTE: No "// !$*UTF8*$!" header — Xcode 26+ parses pbxproj with JSON first,
+# and the // comment causes NSJSONSerialization to fail at line 1 column 0.
+# Starting with { allows both OpenStep plist and JSON parsers to proceed.
 lines.append("{")
 lines.append(f'\tarchiveVersion = 1;')
 lines.append(f'\tclasses = {{')
 lines.append(f'\t}};')
-lines.append(f'\tobjectVersion = 56;')
+lines.append(f'\tobjectVersion = 60;')
 lines.append(f'\tobjects = {{')
 lines.append(f'')
 
@@ -387,19 +389,19 @@ lines.append(f'''{tab}{tab}{project_id} /* Project object */ = {{
 {tab}{tab}{tab}isa = PBXProject;
 {tab}{tab}{tab}attributes = {{
 {tab}{tab}{tab}{tab}BuildIndependentTargetsInParallel = 1;
-{tab}{tab}{tab}{tab}LastSwiftUpdateCheck = 1500;
-{tab}{tab}{tab}{tab}LastUpgradeCheck = 1500;
+{tab}{tab}{tab}{tab}LastSwiftUpdateCheck = 1600;
+{tab}{tab}{tab}{tab}LastUpgradeCheck = 1600;
 {tab}{tab}{tab}{tab}TargetAttributes = {{
 {tab}{tab}{tab}{tab}{tab}{main_target_id} = {{
-{tab}{tab}{tab}{tab}{tab}{tab}CreatedOnToolsVersion = 15.0;
+{tab}{tab}{tab}{tab}{tab}{tab}CreatedOnToolsVersion = 16.0;
 {tab}{tab}{tab}{tab}{tab}}};
 {tab}{tab}{tab}{tab}{tab}{widget_target_id} = {{
-{tab}{tab}{tab}{tab}{tab}{tab}CreatedOnToolsVersion = 15.0;
+{tab}{tab}{tab}{tab}{tab}{tab}CreatedOnToolsVersion = 16.0;
 {tab}{tab}{tab}{tab}{tab}}};
 {tab}{tab}{tab}{tab}}};
 {tab}{tab}{tab}}};
 {tab}{tab}{tab}buildConfigurationList = {proj_config_list} /* Build configuration list for PBXProject "MeloPlayerClone" */;
-{tab}{tab}{tab}compatibilityVersion = "Xcode 14.0";
+{tab}{tab}{tab}compatibilityVersion = "Xcode 16.0";
 {tab}{tab}{tab}developmentRegion = en;
 {tab}{tab}{tab}hasScannedForEncodings = 0;
 {tab}{tab}{tab}knownRegions = (
@@ -584,7 +586,7 @@ scheme_path = os.path.join(xcschemes_dir, "MeloPlayerClone.xcscheme")
 
 scheme = f'''<?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1500"
+   LastUpgradeVersion = "1600"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"

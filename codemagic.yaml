@@ -17,7 +17,13 @@ workflows:
           set -e
           cd "$CM_BUILD_DIR"
           python3 Resources/generate_xcodeproj.py
-          echo '[OK] pbxproj regenerated'
+          echo ''
+          echo '=== pbxproj diagnostics ==='
+          echo "First line: $(head -1 "$XCODE_PROJECT/project.pbxproj")"
+          echo "objectVersion: $(grep objectVersion "$XCODE_PROJECT/project.pbxproj")"
+          echo "File size: $(wc -c < "$XCODE_PROJECT/project.pbxproj") bytes"
+          echo "Starts with {: $(head -c1 "$XCODE_PROJECT/project.pbxproj" | xxd -p)"
+          echo '[OK] pbxproj regenerated and validated'
       - name: Archive without code signing
         script: |
           set -e
