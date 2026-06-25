@@ -412,6 +412,8 @@ proj_debug_settings = {
     "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG",
     "SWIFT_OPTIMIZATION_LEVEL": '"-Onone"',
     "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
+    "SDKROOT": "iphoneos",
+    "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator",
     "SWIFT_VERSION": "5.0",
 }
 
@@ -431,6 +433,8 @@ proj_release_settings = {
     "SWIFT_OPTIMIZATION_LEVEL": '"-O"',
     "VALIDATE_PRODUCT": "YES",
     "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
+    "SDKROOT": "iphoneos",
+    "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator",
     "SWIFT_VERSION": "5.0",
 }
 
