@@ -31,38 +31,28 @@ workflows:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             DEVELOPMENT_TEAM=""
-      - name: Write export options plist
-        script: |
-          cat > "$CM_BUILD_DIR/exportOptions.plist" << 'PLIST'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>debugging</string>
-              <key>signingStyle</key>
-              <string>manual</string>
-          </dict>
-          </plist>
-          PLIST
-      - name: Export unsigned ipa
+      - name: Package unsigned IPA from archive
         script: |
           set -e
-          mkdir -p "$CM_BUILD_DIR/build/ios/ipa"
-          xcodebuild -exportArchive \
-            -archivePath "$CM_BUILD_DIR/$XCARCHIVE_PATH" \
-            -exportOptionsPlist "$CM_BUILD_DIR/exportOptions.plist" \
-            -exportPath "$CM_BUILD_DIR/build/ios/ipa" \
-            CODE_SIGNING_ALLOWED=NO \
-            DEVELOPMENT_TEAM=""
+          mkdir -p "$CM_BUILD_DIR/build/ios/ipa/Payload"
+          APP=$(find "$CM_BUILD_DIR/$XCARCHIVE_PATH/Products" -name "*.app" -type d | head -1)
+          if [ -z "$APP" ]; then
+            echo "ERROR: No .app found in archive"
+            exit 1
+          fi
+          cp -R "$APP" "$CM_BUILD_DIR/build/ios/ipa/Payload/"
+          cd "$CM_BUILD_DIR/build/ios/ipa"
+          zip -r MeloPlayerClone.ipa Payload
+          echo "[OK] IPA created: $(wc -c < MeloPlayerClone.ipa) bytes"
     artifacts:
       - build/ios/ipa/*.ipa
+      - build/ios/xcarchive/*.xcarchive
       - /tmp/xcodebuild_logs/*.log
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
     publishing:
       email:
         recipients:
-          - shadowvr7913@gmail.com          # <-- Replace with your email
+          - shadowvr7913@gmail.com
         notify:
           success: true
           failure: true
