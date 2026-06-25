@@ -21,7 +21,16 @@ workflows:
           echo '=== pbxproj diagnostics ==='
           echo "First 80 chars: $(head -c80 "$XCODE_PROJECT/project.pbxproj")"
           echo "File size: $(wc -c < "$XCODE_PROJECT/project.pbxproj") bytes"
-          python3 -c "import json; d=json.load(open('$XCODE_PROJECT/project.pbxproj')); print(f'Valid JSON: YES, archiveVersion={d[chr(34)+'archiveVersion'+chr(34)]} ({chr(39)}{chr(39)}.join([type(d[chr(34)+'archiveVersion'+chr(34)]).__name__])), objectVersion={d[chr(34)+'objectVersion'+chr(34)]}, objects={len(d[chr(34)+'objects'+chr(34)])}')"
+          python3 << 'PYEOF'
+import json
+pbx = "MeloPlayerClone.xcodeproj/project.pbxproj"
+d = json.load(open(pbx))
+print(f"Valid JSON: YES")
+print(f"archiveVersion={d['archiveVersion']} ({type(d['archiveVersion']).__name__})")
+print(f"objectVersion={d['objectVersion']} ({type(d['objectVersion']).__name__})")
+print(f"objects={len(d['objects'])}")
+print(f"rootObject={d['rootObject']}")
+PYEOF
           echo '[OK] pbxproj regenerated and validated'
       - name: Archive without code signing
         script: |
