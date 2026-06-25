@@ -64,7 +64,6 @@ WIDGET_SOURCES = [
 
 MAIN_RESOURCES = [
     "Resources/Assets.xcassets",
-    "Resources/Info.plist",
 ]
 
 WIDGET_RESOURCES = []
