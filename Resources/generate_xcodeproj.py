@@ -558,7 +558,7 @@ lines.append(f'}}')
 
 # ── Write file ──────────────────────────────────────────────────────
 content = "\n".join(lines)
-with open(PBXPROJ_PATH, "w", encoding="utf-8") as f:
+with open(PBXPROJ_PATH, "w", encoding="utf-8", newline="\n") as f:
     f.write(content)
 
 print(f"[OK] Wrote {PBXPROJ_PATH} ({len(content)} bytes)")
@@ -648,7 +648,7 @@ scheme = f'''<?xml version="1.0" encoding="UTF-8"?>
 </Scheme>
 '''
 
-with open(scheme_path, "w", encoding="utf-8") as f:
+with open(scheme_path, "w", encoding="utf-8", newline="\n") as f:
     f.write(scheme)
 
 print(f"[OK] Wrote {scheme_path}")

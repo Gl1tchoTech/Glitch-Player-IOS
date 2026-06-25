@@ -1,2 +1,16 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Xcode project files — MUST use LF line endings on macOS
+*.pbxproj    text eol=lf
+*.xcscheme   text eol=lf
+*.plist      text eol=lf
+*.entitlements text eol=lf
+*.xcprivacy  text eol=lf
+
+# Swift source files
+*.swift      text eol=lf
+
+# YAML configuration
+*.yaml       text eol=lf
+*.yml        text eol=lf
+
+# PNG icons — binary, never convert
+*.png        binary
