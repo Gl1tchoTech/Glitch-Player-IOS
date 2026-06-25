@@ -12,6 +12,43 @@ workflows:
         XCODE_SCHEME: MeloPlayerClone
         XCARCHIVE_PATH: build/ios/xcarchive/MeloPlayerClone.xcarchive
     scripts:
+      - name: Fix pbxproj plist syntax (line endings + quoted values)
+        script: |
+          set -e
+          PBX="$CM_BUILD_DIR/$XCODE_PROJECT/project.pbxproj"
+          python3 -c "
+import re
+with open('$PBX', 'r') as f:
+    data = f.read()
+
+# 1. Strip any CRLF -> LF
+data = data.replace('\r\n', '\n').replace('\r', '\n')
+
+# 2. Quote GCC_PREPROCESSOR_DEFINITIONS value (contains spaces, \$)
+data = re.sub(
+    r'GCC_PREPROCESSOR_DEFINITIONS = DEBUG=1 .inherited.;',
+    'GCC_PREPROCESSOR_DEFINITIONS = \"DEBUG=1 \$(inherited)\";',
+    data
+)
+
+# 3. Quote iPad orientation string (contains spaces)
+data = re.sub(
+    r'INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight;',
+    'INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = \"UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight\";',
+    data
+)
+
+# 4. Quote empty NSHumanReadableCopyright
+data = re.sub(
+    r'INFOPLIST_KEY_NSHumanReadableCopyright = ;',
+    'INFOPLIST_KEY_NSHumanReadableCopyright = \"\";',
+    data
+)
+
+with open('$PBX', 'w') as f:
+    f.write(data)
+print('[OK] pbxproj patched')
+"
       - name: Archive without code signing
         script: |
           set -e
