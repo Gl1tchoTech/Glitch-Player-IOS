@@ -497,9 +497,9 @@ objects[widget_config_list] = config_list_obj([widget_debug, widget_release])
 # ── Root object ──────────────────────────────────────────────────────────
 
 pbxproj = {
-    "archiveVersion": 1,
+    "archiveVersion": "1",
     "classes": {},
-    "objectVersion": 60,
+    "objectVersion": "60",
     "objects": objects,
     "rootObject": project_id,
 }
