@@ -172,12 +172,12 @@ objects = {}
 
 # --- PBXFileReference ---
 
-def file_ref_obj(path, name=None, explicit_file_type=None, source_tree="<group>", include_in_index=None):
+def file_ref_obj(path, name=None, explicit_file_type=None, source_tree="SOURCE_ROOT", include_in_index=None):
     """Create a PBXFileReference dict."""
     obj = {
         "isa": "PBXFileReference",
         "lastKnownFileType": last_known_file_type(path),
-        "path": name if name else os.path.basename(path),
+        "path": path,
         "sourceTree": source_tree,
     }
     if explicit_file_type:
@@ -439,7 +439,6 @@ objects[proj_release] = build_config_obj("Release", proj_release_settings)
 
 # Main target settings
 main_target_settings = {
-    "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
     "CODE_SIGN_STYLE": "Automatic",
     "CURRENT_PROJECT_VERSION": "1",
     "ENABLE_PREVIEWS": "YES",
@@ -455,7 +454,6 @@ main_target_settings = {
     "PRODUCT_NAME": '"$(TARGET_NAME)"',
     "SWIFT_EMIT_LOC_STRINGS": "YES",
     "TARGETED_DEVICE_FAMILY": '"1,2"',
-    "INFOPLIST_FILE": "Resources/Info.plist",
 }
 
 objects[main_debug]   = build_config_obj("Debug", main_target_settings)
