@@ -1,59 +1,51 @@
 workflows:
 
-  # ── Ad Hoc Build (testing / sideloading) ─────────────────────────
-  meloplayer-adhoc:
-    name: MeloPlayer Ad Hoc
+  # ── Unsigned IPA Build ────────────────────────────────────────────
+  meloplayer-build:
+    name: MeloPlayer Build
     max_build_duration: 120
     instance_type: mac_mini_m2
     environment:
       xcode: latest
-      ios_signing:
-        distribution_type: ad_hoc
-        bundle_identifier: com.meloplayer.app
       vars:
         XCODE_PROJECT: MeloPlayerClone.xcodeproj
         XCODE_SCHEME: MeloPlayerClone
+        XCARCHIVE_PATH: build/ios/xcarchive/MeloPlayerClone.xcarchive
     scripts:
-      - name: Set up provisioning profiles
-        script: xcode-project use-profiles
-      - name: Build ipa
+      - name: Archive without code signing
         script: |
-          xcode-project build-ipa \
-            --project "$CM_BUILD_DIR/$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME"
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-    publishing:
-      email:
-        recipients:
-          - you@example.com          # <-- Replace with your email
-        notify:
-          success: true
-          failure: true
-
-  # ── App Store Build (IPA only, no publishing) ────────────────────
-  meloplayer-release:
-    name: MeloPlayer Release
-    max_build_duration: 120
-    instance_type: mac_mini_m2
-    environment:
-      xcode: latest
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.meloplayer.app
-      vars:
-        XCODE_PROJECT: MeloPlayerClone.xcodeproj
-        XCODE_SCHEME: MeloPlayerClone
-    scripts:
-      - name: Set up provisioning profiles
-        script: xcode-project use-profiles
-      - name: Build ipa
+          set -e
+          xcodebuild archive \
+            -project "$CM_BUILD_DIR/$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -sdk iphoneos \
+            -archivePath "$CM_BUILD_DIR/$XCARCHIVE_PATH" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM=""
+      - name: Write export options plist
         script: |
-          xcode-project build-ipa \
-            --project "$CM_BUILD_DIR/$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME"
+          cat > "$CM_BUILD_DIR/exportOptions.plist" << 'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>development</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+          </dict>
+          </plist>
+          PLIST
+      - name: Export unsigned ipa
+        script: |
+          set -e
+          mkdir -p "$CM_BUILD_DIR/build/ios/ipa"
+          xcodebuild -exportArchive \
+            -archivePath "$CM_BUILD_DIR/$XCARCHIVE_PATH" \
+            -exportOptionsPlist "$CM_BUILD_DIR/exportOptions.plist" \
+            -exportPath "$CM_BUILD_DIR/build/ios/ipa"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
