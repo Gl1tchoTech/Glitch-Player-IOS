@@ -1,0 +1,87 @@
+workflows:
+
+  # ── Ad Hoc / Testing Build ───────────────────────────────────────
+  meloplayer-adhoc:
+    name: MeloPlayer Ad Hoc
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    environment:
+      xcode: latest
+      ios_signing:
+        distribution_type: ad_hoc
+        bundle_identifier: com.meloplayer.app
+      vars:
+        XCODE_PROJECT: MeloPlayerClone/MeloPlayerClone.xcodeproj
+        XCODE_SCHEME: MeloPlayerClone
+    scripts:
+      - name: Set up provisioning profiles
+        script: xcode-project use-profiles
+      - name: Build ipa for ad hoc distribution
+        script: |
+          xcode-project build-ipa \
+            --project "$CM_BUILD_DIR/$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+    publishing:
+      email:
+        recipients:
+          - you@example.com          # <-- Replace with your email
+        notify:
+          success: true
+          failure: true
+
+  # ── App Store / TestFlight Build ─────────────────────────────────
+  meloplayer-release:
+    name: MeloPlayer Release
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: meloplayer
+    environment:
+      xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.meloplayer.app
+      vars:
+        XCODE_PROJECT: MeloPlayerClone/MeloPlayerClone.xcodeproj
+        XCODE_SCHEME: MeloPlayerClone
+        # Find this in App Store Connect > Your App > General > App Information > Apple ID
+        APP_STORE_APPLE_ID: ""   # <-- REQUIRED: Replace with your numeric Apple ID (e.g., 1555555551)
+    scripts:
+      - name: Set up provisioning profiles
+        script: xcode-project use-profiles
+      - name: Increment build number
+        script: |
+          cd "$CM_BUILD_DIR/$XCODE_PROJECT/.."
+          # Bump via agvtool using the latest TestFlight build number + 1
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
+          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+      - name: Build ipa for App Store distribution
+        script: |
+          xcode-project build-ipa \
+            --project "$CM_BUILD_DIR/$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+    publishing:
+      email:
+        recipients:
+          - you@example.com          # <-- Replace with your email
+        notify:
+          success: true
+          failure: true
+      app_store_connect:
+        auth: integration
+        # Submit to TestFlight for beta review
+        submit_to_testflight: true
+        # Automatically expire previous build waiting for review
+        expire_build_submitted_for_review: true
+        # Optionally submit directly to App Store review (set to true when ready)
+        submit_to_app_store: false
+        # Cancel previous App Store submission when submitting new build
+        cancel_previous_submissions: true
