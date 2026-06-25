@@ -93,9 +93,9 @@ struct AudiusSearchView: View {
             } else {
                 Spacer()
                 VStack(spacing: 12) {
-                    Image(systemName: "music.magnifyingglass")
+                    Image(systemName: "magnifyingglass")
                         .font(.system(size: 40))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.pink.opacity(0.5))
                     Text("Search for music")
                         .font(.system(size: 16, weight: .medium))
                     Text("Find tracks, artists, and albums")

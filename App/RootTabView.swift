@@ -67,12 +67,16 @@ struct RootTabView: View {
                     }
                     .tag(Tab.settings)
             }
+            .tint(theme.accentColor.color)
             
-            // Mini Player overlay
-            if player.currentTrack != nil {
-                MiniPlayerView()
-                    .environment(player)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            // Mini Player overlay — positioned above tab bar
+            VStack(spacing: 0) {
+                if player.currentTrack != nil {
+                    MiniPlayerView()
+                        .environment(player)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+                Spacer().frame(height: 49) // Standard tab bar height
             }
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: player.currentTrack != nil)

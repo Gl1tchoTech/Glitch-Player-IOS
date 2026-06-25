@@ -12,7 +12,7 @@ final class AudioSessionManager {
                 .playback,
                 mode: .default,
                 policy: .longFormAudio,
-                options: [.allowAirPlay, .allowBluetooth, .allowBluetoothA2DP]
+                options: [.allowBluetooth, .allowBluetoothA2DP]
             )
             try session.setActive(true)
         } catch {

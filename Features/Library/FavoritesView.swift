@@ -11,12 +11,12 @@ struct FavoritesView: View {
                 VStack(spacing: 16) {
                     Image(systemName: "heart")
                         .font(.system(size: 48))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.gray.opacity(0.5))
                     Text("No Favorites")
                         .font(.system(size: 18, weight: .semibold))
                     Text("Tap the heart icon on tracks to add them here")
                         .font(.system(size: 14))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                 }
                 .padding(.top, 80)
             } else {

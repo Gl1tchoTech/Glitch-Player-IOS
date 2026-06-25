@@ -13,7 +13,8 @@ struct NowPlayingView: View {
             // Background gradient from artwork
             LinearGradient(
                 gradient: Gradient(colors: [
-                    player.currentArtworkColor.opacity(0.6),
+                    player.currentArtworkColor.opacity(0.5),
+                    Color.black.opacity(0.8),
                     Color.black
                 ]),
                 startPoint: .top,
@@ -50,28 +51,29 @@ struct NowPlayingView: View {
                             .frame(width: 28, height: 28)
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 8)
-                
-                Spacer()
+                .padding(.horizontal, 24)
+                .padding(.top, 12)
                 
                 // Artwork
                 artworkView
                     .padding(.horizontal, 40)
+                    .padding(.top, 24)
                 
                 // Track Info
-                VStack(spacing: 4) {
+                VStack(spacing: 6) {
                     Text(player.currentTrack?.name ?? "Not Playing")
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundColor(.white)
                         .lineLimit(1)
+                        .multilineTextAlignment(.center)
                     
                     Text(player.currentTrack?.artists ?? "Unknown Artist")
                         .font(.system(size: 16))
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(.white.opacity(0.6))
                         .lineLimit(1)
                 }
-                .padding(.top, 32)
+                .padding(.horizontal, 32)
+                .padding(.top, 28)
                 
                 // Progress Slider
                 VStack(spacing: 0) {
@@ -94,79 +96,91 @@ struct NowPlayingView: View {
                     
                     HStack {
                         Text(formatTime(player.currentTime))
-                            .font(.system(size: 11))
-                            .foregroundColor(.white.opacity(0.6))
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.5))
                         
                         Spacer()
                         
-                        Text(formatTime(player.duration - player.currentTime))
-                            .font(.system(size: 11))
-                            .foregroundColor(.white.opacity(0.6))
+                        Text("-" + formatTime(max(0, player.duration - player.currentTime)))
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.5))
                     }
                     .padding(.horizontal, 28)
-                    .padding(.top, 2)
+                    .padding(.top, 4)
                 }
                 .padding(.top, 24)
                 
-                // Controls
-                HStack(spacing: 32) {
+                // Transport Controls
+                HStack(spacing: 40) {
                     // Shuffle
                     Button(action: { player.toggleShuffle() }) {
                         Image(systemName: "shuffle")
-                            .font(.system(size: 20))
-                            .foregroundColor(player.isShuffled ? .pink : .white.opacity(0.7))
+                            .font(.system(size: 18))
+                            .foregroundColor(player.isShuffled ? .pink : .white.opacity(0.6))
                     }
                     
                     // Previous
                     Button(action: { player.previousTrack() }) {
                         Image(systemName: "backward.fill")
-                            .font(.system(size: 28))
+                            .font(.system(size: 32))
                             .foregroundColor(.white)
                     }
                     
                     // Play/Pause
                     Button(action: { player.togglePlayPause() }) {
-                        Image(systemName: player.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                            .font(.system(size: 64))
-                            .foregroundColor(.white)
+                        ZStack {
+                            Circle()
+                                .fill(.white)
+                                .frame(width: 72, height: 72)
+                            
+                            Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                                .font(.system(size: 28))
+                                .foregroundColor(.black)
+                                .offset(x: player.isPlaying ? 0 : 2)
+                        }
                     }
                     
                     // Next
                     Button(action: { player.nextTrack() }) {
                         Image(systemName: "forward.fill")
-                            .font(.system(size: 28))
+                            .font(.system(size: 32))
                             .foregroundColor(.white)
                     }
                     
                     // Repeat
                     Button(action: { player.toggleRepeat() }) {
                         Image(systemName: player.repeatMode.systemImage)
-                            .font(.system(size: 20))
-                            .foregroundColor(player.repeatMode != .off ? .pink : .white.opacity(0.7))
+                            .font(.system(size: 18))
+                            .foregroundColor(player.repeatMode != .off ? .pink : .white.opacity(0.6))
+                    }
+                }
+                .padding(.top, 28)
+                
+                // Bottom row: EQ, Sleep Timer
+                HStack(spacing: 48) {
+                    Button(action: { player.showingEqualizerSheet = true }) {
+                        VStack(spacing: 4) {
+                            Image(systemName: "slider.horizontal.3")
+                                .font(.system(size: 22))
+                            Text("EQ")
+                                .font(.system(size: 10))
+                        }
+                        .foregroundColor(.white.opacity(0.5))
+                    }
+                    
+                    Button(action: { player.showingSleepTimerSheet = true }) {
+                        VStack(spacing: 4) {
+                            Image(systemName: "moon.zzz")
+                                .font(.system(size: 22))
+                            Text("Sleep")
+                                .font(.system(size: 10))
+                        }
+                        .foregroundColor(.white.opacity(0.5))
                     }
                 }
                 .padding(.top, 24)
                 
-                // Bottom row: EQ, AirPlay, Sleep Timer
-                HStack(spacing: 40) {
-                    Button(action: { player.showingEqualizerSheet = true }) {
-                        Image(systemName: "slider.horizontal.3")
-                            .font(.system(size: 18))
-                            .foregroundColor(.white.opacity(0.6))
-                    }
-                    
-                    Spacer()
-                    
-                    Button(action: { player.showingSleepTimerSheet = true }) {
-                        Image(systemName: "moon.zzz")
-                            .font(.system(size: 18))
-                            .foregroundColor(.white.opacity(0.6))
-                    }
-                }
-                .padding(.horizontal, 48)
-                .padding(.top, 20)
-                
-                Spacer()
+                Spacer(minLength: 20)
             }
         }
         .sheet(isPresented: Binding(
@@ -191,7 +205,7 @@ struct NowPlayingView: View {
             set: { player.showingSleepTimerSheet = $0 }
         )) {
             SleepTimerSheet()
-                .presentationDetents([.height(250)])
+                .presentationDetents([.height(280)])
                 .presentationDragIndicator(.visible)
         }
     }
@@ -204,29 +218,42 @@ struct NowPlayingView: View {
                 Image(uiImage: artwork)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-            } else {
-                AsyncImage(url: URL(string: player.currentTrack?.albumImageURL ?? "")) { phase in
+            } else if let url = URL(string: player.currentTrack?.albumImageURL ?? "") {
+                AsyncImage(url: url) { phase in
                     switch phase {
                     case .success(let image):
                         image
                             .resizable()
                             .aspectRatio(contentMode: .fill)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                    case .failure:
+                        artworkPlaceholder
                     default:
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(.gray.opacity(0.3))
-                            .overlay(
-                                Image(systemName: "music.note")
-                                    .font(.system(size: 64))
-                                    .foregroundColor(.gray)
-                            )
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(.white.opacity(0.05))
+                            ProgressView()
+                                .tint(.white)
+                        }
                     }
                 }
+            } else {
+                artworkPlaceholder
             }
         }
         .aspectRatio(1, contentMode: .fit)
-        .shadow(color: .black.opacity(0.4), radius: 20, y: 8)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.5), radius: 30, y: 15)
         .scaleEffect(artworkScale)
+        .animation(.spring(response: 0.5, dampingFraction: 0.7), value: player.currentTrack?.id)
+    }
+    
+    var artworkPlaceholder: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.white.opacity(0.08))
+            Image(systemName: "music.note")
+                .font(.system(size: 64))
+                .foregroundColor(.white.opacity(0.15))
+        }
     }
 }

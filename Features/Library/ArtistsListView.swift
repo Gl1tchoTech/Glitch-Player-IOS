@@ -11,12 +11,12 @@ struct ArtistsListView: View {
                 VStack(spacing: 16) {
                     Image(systemName: "person.2")
                         .font(.system(size: 48))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.gray.opacity(0.5))
                     Text("No Artists")
                         .font(.system(size: 18, weight: .semibold))
                     Text("Import music to see artists here")
                         .font(.system(size: 14))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                 }
                 .padding(.top, 80)
             } else {
@@ -27,7 +27,8 @@ struct ArtistsListView: View {
                         }
                         .buttonStyle(.plain)
                         
-                        Divider().padding(.leading, 64)
+                        Divider()
+                            .padding(.leading, 68)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -51,11 +52,12 @@ struct ArtistRow: View {
     var body: some View {
         HStack(spacing: 16) {
             Circle()
-                .fill(.gray.opacity(0.2))
+                .fill(.gray.opacity(0.12))
                 .frame(width: 48, height: 48)
                 .overlay(
                     Image(systemName: "person.fill")
-                        .foregroundColor(.gray)
+                        .font(.system(size: 20))
+                        .foregroundColor(.gray.opacity(0.5))
                 )
             
             VStack(alignment: .leading, spacing: 2) {
@@ -64,14 +66,14 @@ struct ArtistRow: View {
                 
                 Text("\(trackCount) tracks")
                     .font(.system(size: 13))
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
             }
             
             Spacer()
             
             Image(systemName: "chevron.right")
-                .font(.system(size: 14))
-                .foregroundColor(.gray)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.gray.opacity(0.5))
         }
         .padding(.vertical, 12)
     }
@@ -84,12 +86,24 @@ struct ArtistDetailView: View {
     
     var body: some View {
         List {
-            ForEach(tracks) { track in
-                TrackRowView(track: track) {
-                    player.play(track: track, queue: tracks, startIndex: tracks.firstIndex(of: track) ?? 0)
+            if tracks.isEmpty {
+                HStack {
+                    Spacer()
+                    Text("No tracks by this artist")
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+                .padding(.vertical, 40)
+            } else {
+                ForEach(tracks) { track in
+                    TrackRowView(track: track) {
+                        player.play(track: track, queue: tracks, startIndex: tracks.firstIndex(of: track) ?? 0)
+                    }
                 }
             }
         }
+        .listStyle(.plain)
         .navigationTitle(artist)
     }
 }

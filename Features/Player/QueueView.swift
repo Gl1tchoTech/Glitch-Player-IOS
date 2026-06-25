@@ -20,14 +20,13 @@ struct QueueView: View {
                 }
                 
                 // Up Next
-                if player.queue.count > player.queueIndex + 1 {
-                    Section("Up Next") {
-                        ForEach(
-                            Array(player.queue.enumerated().filter {
-                                $0.offset > player.queueIndex
-                            }),
-                            id: \.element.id
-                        ) { index, track in
+                let upcoming = Array(player.queue.enumerated().filter {
+                    $0.offset > player.queueIndex
+                })
+                
+                if !upcoming.isEmpty {
+                    Section("Up Next (\(upcoming.count))") {
+                        ForEach(upcoming, id: \.element.id) { index, track in
                             QueueTrackRow(
                                 track: track,
                                 isNowPlaying: false,
@@ -47,8 +46,20 @@ struct QueueView: View {
                             }
                         }
                     }
+                } else {
+                    Section {
+                        HStack {
+                            Spacer()
+                            Text("Queue is empty")
+                                .font(.system(size: 14))
+                                .foregroundColor(.secondary)
+                            Spacer()
+                        }
+                        .padding(.vertical, 20)
+                    }
                 }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle("Queue")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -58,7 +69,6 @@ struct QueueView: View {
                 
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Clear") {
-                        // Remove all after current
                         let toRemove = max(0, player.queue.count - player.queueIndex - 1)
                         for _ in 0..<toRemove {
                             player.removeFromQueue(at: player.queueIndex + 1)
@@ -88,15 +98,16 @@ struct QueueTrackRow: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 44, height: 44)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .shadow(color: .black.opacity(0.1), radius: 3, y: 1)
                 default:
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(.gray.opacity(0.2))
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(.gray.opacity(0.1))
                         .frame(width: 44, height: 44)
                         .overlay(
                             Image(systemName: "music.note")
                                 .font(.system(size: 16))
-                                .foregroundColor(.gray)
+                                .foregroundColor(.gray.opacity(0.5))
                         )
                 }
             }
@@ -109,7 +120,7 @@ struct QueueTrackRow: View {
                 
                 Text(track.artists)
                     .font(.system(size: 13))
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
                     .lineLimit(1)
             }
             
@@ -130,7 +141,7 @@ struct QueueTrackRow: View {
                 Button(action: onRemove) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 16))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                 }
             }
         }

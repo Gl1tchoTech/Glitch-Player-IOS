@@ -44,7 +44,7 @@ struct LibraryView: View {
                 }
             }
             .navigationTitle("Library")
-            .searchable(text: $searchText, prompt: "Search your library")
+            .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search library")
         }
     }
 }
@@ -58,14 +58,30 @@ struct SongsListView: View {
     @State private var tracks: [Track] = []
     
     var body: some View {
-        List {
-            ForEach(tracks) { track in
-                TrackRowView(track: track) {
-                    player.play(track: track, queue: tracks, startIndex: tracks.firstIndex(of: track) ?? 0)
+        Group {
+            if tracks.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "music.note.list")
+                        .font(.system(size: 48))
+                        .foregroundColor(.gray.opacity(0.5))
+                    Text("No Songs")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Import music or add tracks from Browse")
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
                 }
+                .padding(.top, 80)
+            } else {
+                List {
+                    ForEach(tracks) { track in
+                        TrackRowView(track: track) {
+                            player.play(track: track, queue: tracks, startIndex: tracks.firstIndex(of: track) ?? 0)
+                        }
+                    }
+                }
+                .listStyle(.plain)
             }
         }
-        .listStyle(.plain)
         .onAppear {
             tracks = (try? library.allTracks()) ?? []
         }

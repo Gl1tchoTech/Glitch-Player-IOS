@@ -52,10 +52,13 @@ struct BrowseView: View {
             if viewModel.trendingTracks.isEmpty {
                 loadingState
             } else {
-                LazyVStack(spacing: 4) {
+                LazyVStack(spacing: 0) {
                     ForEach(viewModel.trendingTracks) { apiTrack in
                         let track = apiTrack.toTrack()
                         BrowseTrackRow(apiTrack: apiTrack, track: track)
+                        Divider()
+                            .padding(.leading, 72)
+                            .opacity(0.4)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -75,7 +78,7 @@ struct BrowseView: View {
             } else {
                 LazyVGrid(
                     columns: [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)],
-                    spacing: 16
+                    spacing: 20
                 ) {
                     ForEach(viewModel.newReleaseAlbums) { album in
                         VStack(spacing: 8) {
@@ -84,21 +87,26 @@ struct BrowseView: View {
                                 case .success(let image):
                                     image.resizable().aspectRatio(1, contentMode: .fill)
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .shadow(color: .black.opacity(0.1), radius: 6, y: 3)
                                 default:
                                     RoundedRectangle(cornerRadius: 12)
-                                        .fill(.gray.opacity(0.2))
+                                        .fill(.gray.opacity(0.1))
                                         .aspectRatio(1, contentMode: .fill)
-                                        .overlay(Image(systemName: "square.stack").foregroundColor(.gray))
+                                        .overlay(
+                                            Image(systemName: "square.stack")
+                                                .font(.system(size: 28))
+                                                .foregroundColor(.gray.opacity(0.4))
+                                        )
                                 }
                             }
                             
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(album.name)
-                                    .font(.system(size: 13, weight: .medium))
+                                    .font(.system(size: 13, weight: .semibold))
                                     .lineLimit(1)
                                 Text(album.artists)
                                     .font(.system(size: 11))
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.secondary)
                                     .lineLimit(1)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -122,7 +130,7 @@ struct BrowseView: View {
             } else {
                 LazyVGrid(
                     columns: [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)],
-                    spacing: 16
+                    spacing: 20
                 ) {
                     ForEach(viewModel.featuredPlaylists) { playlist in
                         VStack(spacing: 8) {
@@ -131,21 +139,26 @@ struct BrowseView: View {
                                 case .success(let image):
                                     image.resizable().aspectRatio(1, contentMode: .fill)
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .shadow(color: .black.opacity(0.1), radius: 6, y: 3)
                                 default:
                                     RoundedRectangle(cornerRadius: 12)
-                                        .fill(.gray.opacity(0.2))
+                                        .fill(.gray.opacity(0.1))
                                         .aspectRatio(1, contentMode: .fill)
-                                        .overlay(Image(systemName: "music.note.list").foregroundColor(.gray))
+                                        .overlay(
+                                            Image(systemName: "music.note.list")
+                                                .font(.system(size: 28))
+                                                .foregroundColor(.gray.opacity(0.4))
+                                        )
                                 }
                             }
                             
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(playlist.name)
-                                    .font(.system(size: 13, weight: .medium))
+                                    .font(.system(size: 13, weight: .semibold))
                                     .lineLimit(1)
                                 Text("\(playlist.tracksCount) tracks")
                                     .font(.system(size: 11))
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.secondary)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -167,7 +180,7 @@ struct BrowseView: View {
                 .scaleEffect(1.2)
             Text("Loading...")
                 .font(.system(size: 14))
-                .foregroundColor(.gray)
+                .foregroundColor(.secondary)
         }
         .padding(.top, 80)
     }

@@ -13,12 +13,12 @@ struct PlaylistsView: View {
                 VStack(spacing: 16) {
                     Image(systemName: "music.note.list")
                         .font(.system(size: 48))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.gray.opacity(0.5))
                     Text("No Playlists Yet")
                         .font(.system(size: 18, weight: .semibold))
                     Text("Create your first playlist")
                         .font(.system(size: 14))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                     
                     Button(action: { showCreateSheet = true }) {
                         Label("New Playlist", systemImage: "plus")
@@ -34,7 +34,7 @@ struct PlaylistsView: View {
             } else {
                 LazyVGrid(
                     columns: [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)],
-                    spacing: 16
+                    spacing: 20
                 ) {
                     ForEach(playlists) { playlist in
                         NavigationLink(destination: PlaylistDetailView(playlist: playlist)) {
@@ -57,9 +57,11 @@ struct PlaylistsView: View {
     var createPlaylistSheet: some View {
         NavigationStack {
             Form {
-                Section("Playlist Details") {
+                Section {
                     TextField("Name", text: $newPlaylistName)
                     TextField("Description (optional)", text: $newPlaylistDesc)
+                } header: {
+                    Text("Playlist Details")
                 }
             }
             .navigationTitle("New Playlist")
@@ -90,10 +92,10 @@ struct PlaylistCard: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 14)
                     .fill(
                         LinearGradient(
-                            gradient: Gradient(colors: [.pink.opacity(0.6), .purple.opacity(0.4)]),
+                            gradient: Gradient(colors: [.pink.opacity(0.5), .purple.opacity(0.3)]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -102,9 +104,10 @@ struct PlaylistCard: View {
                 
                 Image(systemName: "music.note.list")
                     .font(.system(size: 32))
-                    .foregroundColor(.white)
+                    .foregroundColor(.white.opacity(0.8))
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .shadow(color: .black.opacity(0.1), radius: 6, y: 3)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(playlist.name)
@@ -113,7 +116,7 @@ struct PlaylistCard: View {
                 
                 Text("\(playlist.tracksCount) tracks")
                     .font(.system(size: 12))
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, 8)
@@ -128,16 +131,30 @@ struct PlaylistDetailView: View {
     
     var body: some View {
         List {
-            ForEach(playlist.tracks) { track in
-                TrackRowView(track: track) {
-                    player.play(track: track, queue: playlist.tracks, startIndex: playlist.tracks.firstIndex(of: track) ?? 0)
+            if playlist.tracks.isEmpty {
+                HStack {
+                    Spacer()
+                    Text("No tracks in this playlist")
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                    Spacer()
                 }
+                .padding(.vertical, 40)
+            } else {
+                ForEach(playlist.tracks) { track in
+                    TrackRowView(track: track) {
+                        player.play(track: track, queue: playlist.tracks, startIndex: playlist.tracks.firstIndex(of: track) ?? 0)
+                    }
+                }
+                .onDelete(perform: removeTracks)
             }
-            .onDelete(perform: removeTracks)
         }
+        .listStyle(.plain)
         .navigationTitle(playlist.name)
         .toolbar {
-            EditButton()
+            if !playlist.tracks.isEmpty {
+                EditButton()
+            }
         }
     }
     

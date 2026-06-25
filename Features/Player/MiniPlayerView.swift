@@ -7,12 +7,12 @@ struct MiniPlayerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Progress bar
+            // Slim progress bar
             if player.currentTrack != nil {
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         Capsule()
-                            .fill(.ultraThinMaterial)
+                            .fill(.white.opacity(0.15))
                             .frame(height: 2)
                         Capsule()
                             .fill(.pink)
@@ -24,35 +24,45 @@ struct MiniPlayerView: View {
             
             // Mini player content
             HStack(spacing: 12) {
-                // Artwork
-                AsyncImage(url: URL(string: player.currentTrack?.albumImageURL ?? "")) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
+                // Artwork with corner radius
+                Group {
+                    if let artwork = player.currentArtwork {
+                        Image(uiImage: artwork)
                             .resizable()
                             .aspectRatio(contentMode: .fill)
-                            .frame(width: 44, height: 44)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    default:
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(.gray.opacity(0.3))
-                            .frame(width: 44, height: 44)
-                            .overlay(
-                                Image(systemName: "music.note")
-                                    .foregroundColor(.gray)
-                            )
+                    } else {
+                        AsyncImage(url: URL(string: player.currentTrack?.albumImageURL ?? "")) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                            default:
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(.gray.opacity(0.2))
+                                    .overlay(
+                                        Image(systemName: "music.note")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.gray)
+                                    )
+                            }
+                        }
                     }
                 }
+                .frame(width: 44, height: 44)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
                 
                 // Track info
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 1) {
                     Text(player.currentTrack?.name ?? "Not Playing")
                         .font(.system(size: 14, weight: .semibold))
                         .lineLimit(1)
+                        .foregroundColor(.primary)
                     
                     Text(player.currentTrack?.artists ?? "Select a track")
                         .font(.system(size: 12))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                         .lineLimit(1)
                 }
                 
@@ -61,7 +71,7 @@ struct MiniPlayerView: View {
                 // Play/Pause
                 Button(action: { player.togglePlayPause() }) {
                     Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                        .font(.system(size: 22))
+                        .font(.system(size: 20))
                         .foregroundColor(.primary)
                 }
                 .frame(width: 40, height: 40)
@@ -69,7 +79,7 @@ struct MiniPlayerView: View {
                 // Next
                 Button(action: { player.nextTrack() }) {
                     Image(systemName: "forward.fill")
-                        .font(.system(size: 18))
+                        .font(.system(size: 16))
                         .foregroundColor(.primary)
                 }
                 .frame(width: 36, height: 36)
@@ -80,6 +90,9 @@ struct MiniPlayerView: View {
             .padding(.vertical, 8)
             .background(.ultraThinMaterial)
         }
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal, 8)
+        .padding(.bottom, 4)
         .onTapGesture {
             showingNowPlaying = true
         }
