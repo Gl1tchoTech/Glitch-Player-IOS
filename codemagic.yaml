@@ -19,10 +19,9 @@ workflows:
           python3 Resources/generate_xcodeproj.py
           echo ''
           echo '=== pbxproj diagnostics ==='
-          echo "First line: $(head -1 "$XCODE_PROJECT/project.pbxproj")"
-          echo "objectVersion: $(grep objectVersion "$XCODE_PROJECT/project.pbxproj")"
+          echo "First 80 chars: $(head -c80 "$XCODE_PROJECT/project.pbxproj")"
           echo "File size: $(wc -c < "$XCODE_PROJECT/project.pbxproj") bytes"
-          echo "Starts with {: $(head -c1 "$XCODE_PROJECT/project.pbxproj" | xxd -p)"
+          python3 -c "import json; d=json.load(open('$XCODE_PROJECT/project.pbxproj')); print(f'Valid JSON: YES, archiveVersion={d[chr(34)+'archiveVersion'+chr(34)]} ({chr(39)}{chr(39)}.join([type(d[chr(34)+'archiveVersion'+chr(34)]).__name__])), objectVersion={d[chr(34)+'objectVersion'+chr(34)]}, objects={len(d[chr(34)+'objects'+chr(34)])}')"
           echo '[OK] pbxproj regenerated and validated'
       - name: Archive without code signing
         script: |
