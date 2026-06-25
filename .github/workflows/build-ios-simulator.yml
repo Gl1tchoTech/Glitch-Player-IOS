@@ -1,4 +1,4 @@
-name: Build iOS Simulator App
+name: Build for Appetize
 
 on:
   workflow_dispatch:
@@ -10,25 +10,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app
+      - name: List schemes
+        run: xcodebuild -project MeloPlayerClone.xcodeproj -list
 
       - name: Build
         run: |
           xcodebuild \
-            -scheme MeloPlayerClone \
+            -project MeloPlayerClone.xcodeproj \
+            -scheme "MeloPlayerClone" \
             -configuration Release \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
-            BUILD_DIR=build
+            -destination 'generic/platform=iOS Simulator' \
+            SYMROOT=build
 
-      - name: Zip .app
+      - name: Find app
+        run: find build -name "*.app"
+
+      - name: Zip app
         run: |
-          cd build/Release-iphonesimulator
-          zip -r YourApp.zip *.app
+          APP=$(find build -name "*.app" | head -n 1)
+          ditto -c -k --keepParent "$APP" Appetize.zip
 
-      - name: Upload Artifact
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: ios-simulator-app
-          path: build/Release-iphonesimulator/YourApp.zip
+          name: Appetize
+          path: Appetize.zip
