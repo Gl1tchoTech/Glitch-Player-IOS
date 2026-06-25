@@ -6,9 +6,9 @@ final class PlayerViewModel {
     
     // MARK: - Dependencies
     
-    let audioEngine: AudioEngineCoordinator
-    let equalizerManager: EqualizerManager
-    let remoteCommandManager: RemoteCommandManager
+    var audioEngine: AudioEngineCoordinator?
+    var equalizerManager: EqualizerManager?
+    var remoteCommandManager: RemoteCommandManager?
     var libraryStore: LibraryStore?
     
     // MARK: - State
@@ -48,7 +48,11 @@ final class PlayerViewModel {
     
     // MARK: - Init
     
-    init(
+    init() {
+        // No-op: call configure(...) to wire dependencies
+    }
+    
+    func configure(
         audioEngine: AudioEngineCoordinator,
         equalizerManager: EqualizerManager,
         remoteCommandManager: RemoteCommandManager
@@ -90,11 +94,12 @@ final class PlayerViewModel {
     // MARK: - Playback Actions
     
     var gaplessEnabled: Bool {
-        get { audioEngine.gaplessEnabled }
-        set { audioEngine.gaplessEnabled = newValue }
+        get { audioEngine?.gaplessEnabled ?? true }
+        set { audioEngine?.gaplessEnabled = newValue }
     }
     
     func play(track: Track, queue: [Track] = [], startIndex: Int = 0) {
+        guard let audioEngine else { return }
         self.currentTrack = track
         if !queue.isEmpty {
             self.queue = queue
@@ -156,6 +161,7 @@ final class PlayerViewModel {
     }
     
     func togglePlayPause() {
+        guard let audioEngine else { return }
         if isPlaying {
             audioEngine.pause()
         } else {
@@ -200,17 +206,20 @@ final class PlayerViewModel {
     }
     
     func seek(to time: TimeInterval) {
+        guard let audioEngine else { return }
         audioEngine.seek(to: time)
         currentTime = time
         updateNowPlaying()
     }
     
     func setVolume(_ vol: Float) {
+        guard let audioEngine else { return }
         volume = vol
         audioEngine.volume = vol
     }
     
     func toggleMute() {
+        guard let audioEngine else { return }
         isMuted.toggle()
         audioEngine.isMuted = isMuted
     }
@@ -284,7 +293,7 @@ final class PlayerViewModel {
             guard !Task.isCancelled else { return }
             
             await MainActor.run {
-                self.audioEngine.pause()
+                self.audioEngine?.pause()
                 self.isPlaying = false
                 self.sleepTimerMinutes = 0
                 self.sleepTimerEndDate = nil
@@ -302,6 +311,7 @@ final class PlayerViewModel {
     
     func updateNowPlaying() {
         guard let track = currentTrack else { return }
+        guard let remoteCommandManager else { return }
         remoteCommandManager.updateNowPlaying(
             title: track.name,
             artist: track.artists,
@@ -339,6 +349,7 @@ final class PlayerViewModel {
     // MARK: - Track Finished Handler
     
     private func handleTrackFinished() {
+        guard let audioEngine else { return }
         if repeatMode == .one {
             seek(to: 0)
             audioEngine.play()

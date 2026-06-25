@@ -84,14 +84,21 @@ final class EqualizerManager {
         didSet { applyEnabledState() }
     }
     
-    private let eqUnit: AVAudioUnitEQ
+    private var eqUnit: AVAudioUnitEQ?
     
-    init(eqUnit: AVAudioUnitEQ) {
-        self.eqUnit = eqUnit
+    init() {
+        // No-op: call wire(to:) to connect to an actual EQ unit
+    }
+    
+    func wire(to newEQUnit: AVAudioUnitEQ) {
+        self.eqUnit = newEQUnit
         setupBands()
+        applyPreamp()
+        applyEnabledState()
     }
     
     private func setupBands() {
+        guard let eqUnit = eqUnit else { return }
         let bandTypes: [AVAudioUnitEQFilterType] = [
             .lowShelf,   // 32
             .parametric, // 64
@@ -120,6 +127,7 @@ final class EqualizerManager {
     }
     
     private func applyPreset(_ preset: Preset) {
+        guard let eqUnit = eqUnit else { return }
         for (index, gain) in preset.bands.enumerated() {
             eqUnit.bands[index].gain = gain
             bandGains[index] = gain
@@ -127,16 +135,19 @@ final class EqualizerManager {
     }
     
     private func applyGains() {
+        guard let eqUnit = eqUnit else { return }
         for (index, gain) in bandGains.enumerated() {
             eqUnit.bands[index].gain = gain
         }
     }
     
     private func applyPreamp() {
+        guard let eqUnit = eqUnit else { return }
         eqUnit.globalGain = preamp
     }
     
     private func applyEnabledState() {
+        guard let eqUnit = eqUnit else { return }
         eqUnit.bypass = !isEnabled
     }
     

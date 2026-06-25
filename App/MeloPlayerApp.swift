@@ -19,15 +19,7 @@ struct MeloPlayerApp: App {
     let modelContainer: ModelContainer
     
     init() {
-        // Configure audio session
-        sessionManager.configure()
-        remoteCommandManager.configure()
-        
-        // Connect equalizer manager to engine
-        let eq = EqualizerManager(eqUnit: audioEngine.equalizer)
-        _equalizerManager = State(initialValue: eq)
-        
-        // Create SwiftData container
+        // Phase 1: Initialize all stored properties (no self access)
         do {
             let schema = Schema([
                 Track.self,
@@ -40,17 +32,12 @@ struct MeloPlayerApp: App {
             fatalError("Failed to create ModelContainer: \(error)")
         }
         
-        // Create player view model and wire up library store
+        _equalizerManager = State(initialValue: EqualizerManager())
+        
         let libraryStore = LibraryStore(modelContext: modelContainer.mainContext)
         _libraryStore = State(initialValue: libraryStore)
         
-        let playerVM = PlayerViewModel(
-            audioEngine: audioEngine,
-            equalizerManager: eq,
-            remoteCommandManager: remoteCommandManager
-        )
-        playerVM.libraryStore = libraryStore
-        _playerViewModel = State(initialValue: playerVM)
+        _playerViewModel = State(initialValue: PlayerViewModel())
     }
     
     var body: some Scene {
@@ -69,6 +56,18 @@ struct MeloPlayerApp: App {
                 .onAppear {
                     // Enable background audio
                     sessionManager.enableBackgroundAudio()
+                }
+                .task {
+                    // Wire up dependencies that require self access (Swift 6 init restriction)
+                    sessionManager.configure()
+                    remoteCommandManager.configure()
+                    equalizerManager.wire(to: audioEngine.equalizer)
+                    playerViewModel.configure(
+                        audioEngine: audioEngine,
+                        equalizerManager: equalizerManager,
+                        remoteCommandManager: remoteCommandManager
+                    )
+                    playerViewModel.libraryStore = libraryStore
                 }
         }
     }
