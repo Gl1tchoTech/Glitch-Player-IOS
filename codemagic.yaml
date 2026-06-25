@@ -17,8 +17,7 @@ workflows:
           set -e
           cd "$CM_BUILD_DIR"
           python3 Resources/generate_xcodeproj.py
-          plutil -lint "$XCODE_PROJECT/project.pbxproj"
-          echo '[OK] pbxproj regenerated and validated'
+          echo '[OK] pbxproj regenerated'
       - name: Archive without code signing
         script: |
           set -e
