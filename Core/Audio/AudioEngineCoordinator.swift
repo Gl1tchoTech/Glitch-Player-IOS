@@ -71,7 +71,18 @@ final class AudioEngineCoordinator {
             self.duration = Double(file.length) / file.fileFormat.sampleRate
             self.playerNode.scheduleFile(file, at: nil)
             
-        case .remoteStream(let url), .apiStream, .apiPreview:
+        case .remoteStream(let url):
+            guard let streamURL = source.url else { throw AudioError.invalidSource }
+            let (data, _) = try await URLSession.shared.data(from: streamURL)
+            let tempURL = FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString + ".mp3")
+            try data.write(to: tempURL)
+            let file = try AVAudioFile(forReading: tempURL)
+            self.audioFile = file
+            self.duration = Double(file.length) / file.fileFormat.sampleRate
+            self.playerNode.scheduleFile(file, at: nil)
+
+        case .apiStream, .apiPreview:
             guard let streamURL = source.url else { throw AudioError.invalidSource }
             let (data, _) = try await URLSession.shared.data(from: streamURL)
             let tempURL = FileManager.default.temporaryDirectory

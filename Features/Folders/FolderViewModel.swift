@@ -70,7 +70,7 @@ final class FolderViewModel {
                     isAudio: isAudio,
                     fileSize: Int64(size),
                     modificationDate: date,
-                    `extension`: ext
+                    extension: ext
                 )
             }.sorted { a, b in
                 if a.isDirectory != b.isDirectory {
