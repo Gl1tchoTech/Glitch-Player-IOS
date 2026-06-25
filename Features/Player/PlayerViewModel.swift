@@ -66,29 +66,29 @@ final class PlayerViewModel {
     }
     
     private func setupEngineCallbacks() {
-        audioEngine.onPlaybackStateChanged = { [weak self] playing in
+        audioEngine?.onPlaybackStateChanged = { [weak self] playing in
             self?.isPlaying = playing
         }
         
-        audioEngine.onTimeUpdated = { [weak self] time in
+        audioEngine?.onTimeUpdated = { [weak self] time in
             self?.currentTime = time
         }
         
-        audioEngine.onTrackFinished = { [weak self] in
+        audioEngine?.onTrackFinished = { [weak self] in
             self?.handleTrackFinished()
         }
         
-        audioEngine.onError = { [weak self] error in
+        audioEngine?.onError = { [weak self] error in
             self?.errorMessage = error.localizedDescription
             self?.showError = true
         }
     }
     
     private func setupRemoteCommands() {
-        remoteCommandManager.onTogglePlayPause = { [weak self] in self?.togglePlayPause() }
-        remoteCommandManager.onNextTrack = { [weak self] in self?.nextTrack() }
-        remoteCommandManager.onPreviousTrack = { [weak self] in self?.previousTrack() }
-        remoteCommandManager.onChangePlaybackPosition = { [weak self] position in self?.seek(to: position) }
+        remoteCommandManager?.onTogglePlayPause = { [weak self] in self?.togglePlayPause() }
+        remoteCommandManager?.onNextTrack = { [weak self] in self?.nextTrack() }
+        remoteCommandManager?.onPreviousTrack = { [weak self] in self?.previousTrack() }
+        remoteCommandManager?.onChangePlaybackPosition = { [weak self] position in self?.seek(to: position) }
     }
     
     // MARK: - Playback Actions
