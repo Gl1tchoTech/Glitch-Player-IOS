@@ -17,21 +17,8 @@ workflows:
           set -e
           cd "$CM_BUILD_DIR"
           python3 Resources/generate_xcodeproj.py
-          echo ''
-          echo '=== pbxproj diagnostics ==='
-          echo "First 80 chars: $(head -c80 "$XCODE_PROJECT/project.pbxproj")"
-          echo "File size: $(wc -c < "$XCODE_PROJECT/project.pbxproj") bytes"
-          python3 << 'PYEOF'
-import json
-pbx = "MeloPlayerClone.xcodeproj/project.pbxproj"
-d = json.load(open(pbx))
-print(f"Valid JSON: YES")
-print(f"archiveVersion={d['archiveVersion']} ({type(d['archiveVersion']).__name__})")
-print(f"objectVersion={d['objectVersion']} ({type(d['objectVersion']).__name__})")
-print(f"objects={len(d['objects'])}")
-print(f"rootObject={d['rootObject']}")
-PYEOF
-          echo '[OK] pbxproj regenerated and validated'
+          PBX="$XCODE_PROJECT/project.pbxproj"
+          echo "[OK] pbxproj: $(wc -c < "$PBX") bytes, JSON starts with: $(head -c60 "$PBX")"
       - name: Archive without code signing
         script: |
           set -e
@@ -73,7 +60,7 @@ PYEOF
     publishing:
       email:
         recipients:
-          - you@example.com          # <-- Replace with your email
+          - shadowvr7913@gmail.com          # <-- Replace with your email
         notify:
           success: true
           failure: true
