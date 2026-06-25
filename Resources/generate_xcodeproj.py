@@ -271,8 +271,22 @@ def pbx_frameworks_phase(phase_id):
 {tab}{tab}{tab}runOnlyForDeploymentPostprocessing = 0;
 {tab}{tab}}};'''
 
+def _needs_quoting(v):
+    """NeXTSTEP plist: values with spaces, commas, or parens need double quotes."""
+    if v.startswith('"') and v.endswith('"'):
+        return v  # already quoted
+    if v == '':
+        return '""'
+    # Characters that break NeXTSTEP parsing: space, comma, parens, =
+    if any(c in v for c in (' ', ',', '(', ')', '=', ';')):
+        return f'"{v}"'
+    return v
+
 def pbx_config(config_id, name, settings, isa="XCBuildConfiguration"):
-    sets = "\n".join(f'{tab}{tab}{tab}{tab}{k} = {v};' for k, v in settings.items())
+    sets = "\n".join(
+        f'{tab}{tab}{tab}{tab}{k} = {_needs_quoting(v)};'
+        for k, v in settings.items()
+    )
     return f'''{tab}{tab}{config_id} /* {name} */ = {{
 {tab}{tab}{tab}isa = {isa};
 {tab}{tab}{tab}buildSettings = {{
