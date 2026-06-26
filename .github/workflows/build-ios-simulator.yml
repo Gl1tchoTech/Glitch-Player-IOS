@@ -1,4 +1,4 @@
-name: Build for Appetize
+name: Build GlitchStreamer
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ jobs:
       - name: List schemes
         run: xcodebuild -project MeloPlayerClone.xcodeproj -list
 
-      - name: Build
+      - name: Build for iOS Simulator
         run: |
           xcodebuild \
             -project MeloPlayerClone.xcodeproj \
@@ -23,16 +23,37 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             SYMROOT=build
 
-      - name: Find app
+      - name: Find .app
         run: find build -name "*.app"
 
-      - name: Zip app
+      - name: Create unsigned IPA from .app
         run: |
           APP=$(find build -name "*.app" | head -n 1)
-          ditto -c -k --keepParent "$APP" Appetize.zip
+          APP_NAME=$(basename "$APP")
 
-      - name: Upload
+          mkdir -p Payload
+          cp -R "$APP" Payload/
+          zip -r GlitchStreamer.ipa Payload
+          rm -rf Payload
+
+          echo "[OK] IPA: $(wc -c < GlitchStreamer.ipa) bytes"
+
+      - name: Bundle IPA and zipped .app
+        run: |
+          APP=$(find build -name "*.app" | head -n 1)
+          APP_NAME=$(basename "$APP")
+          BUNDLE_DIR="bundle"
+
+          mkdir -p "$BUNDLE_DIR"
+          cp GlitchStreamer.ipa "$BUNDLE_DIR/GlitchStreamer.ipa"
+          (cd "$(dirname "$APP")" && zip -r "$GITHUB_WORKSPACE/$BUNDLE_DIR/$APP_NAME.zip" "$APP_NAME")
+
+          cd "$BUNDLE_DIR"
+          zip -r GlitchStreamer.zip GlitchStreamer.ipa "$APP_NAME.zip"
+          echo "[OK] GlitchStreamer.zip: $(wc -c < GlitchStreamer.zip) bytes"
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Appetize
-          path: Appetize.zip
+          name: GlitchStreamer
+          path: bundle/GlitchStreamer.zip

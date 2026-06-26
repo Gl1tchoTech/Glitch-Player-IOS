@@ -44,7 +44,27 @@ workflows:
           cd "$CM_BUILD_DIR/build/ios/ipa"
           zip -r ErrorStream.ipa Payload
           echo "[OK] IPA created: $(wc -c < ErrorStream.ipa) bytes"
+      - name: Bundle IPA and zipped .app into GlitchStreamer.zip
+        script: |
+          set -e
+          BUNDLE_DIR="$CM_BUILD_DIR/build/ios/bundle"
+          mkdir -p "$BUNDLE_DIR"
+
+          # Copy the unsigned IPA
+          cp "$CM_BUILD_DIR/build/ios/ipa/ErrorStream.ipa" "$BUNDLE_DIR/ErrorStream.ipa"
+
+          # Zip the raw .app from the archive
+          APP=$(find "$CM_BUILD_DIR/$XCARCHIVE_PATH/Products" -name "*.app" -type d | head -1)
+          APP_NAME=$(basename "$APP")
+          (cd "$(dirname "$APP")" && zip -r "$BUNDLE_DIR/$APP_NAME.zip" "$APP_NAME")
+
+          # Create final GlitchStreamer.zip containing both
+          cd "$BUNDLE_DIR"
+          zip -r GlitchStreamer.zip ErrorStream.ipa "$APP_NAME.zip"
+          echo "[OK] GlitchStreamer.zip: $(wc -c < GlitchStreamer.zip) bytes"
+          echo "  Contents: ErrorStream.ipa, $APP_NAME.zip"
     artifacts:
+      - build/ios/bundle/GlitchStreamer.zip
       - build/ios/ipa/*.ipa
       - build/ios/xcarchive/*.xcarchive
       - /tmp/xcodebuild_logs/*.log
