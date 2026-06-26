@@ -23,11 +23,11 @@ struct NowPlayingProvider: TimelineProvider {
     
     func getTimeline(in context: Context, completion: @escaping (Timeline<NowPlayingEntry>) -> Void) {
         // Read from UserDefaults shared with main app
-        let defaults = UserDefaults(suiteName: "group.com.meloplayer")
+        let defaults = UserDefaults(suiteName: "group.com.errorstream.app")
         let entry = NowPlayingEntry(
             date: Date(),
             trackName: defaults?.string(forKey: "nowPlayingTitle") ?? "Not Playing",
-            artistName: defaults?.string(forKey: "nowPlayingArtist") ?? "Open MeloPlayer",
+            artistName: defaults?.string(forKey: "nowPlayingArtist") ?? "Open ErrorStream",
             isPlaying: defaults?.bool(forKey: "nowPlayingIsPlaying") ?? false,
             albumImageData: defaults?.data(forKey: "nowPlayingArtwork")
         )

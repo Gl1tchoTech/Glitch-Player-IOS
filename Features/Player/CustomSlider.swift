@@ -53,7 +53,11 @@ struct CustomSlider: View {
     }
     
     private func fillWidth(_ totalWidth: CGFloat) -> CGFloat {
-        let ratio = (value - range.lowerBound) / (range.upperBound - range.lowerBound)
+        guard totalWidth.isFinite, totalWidth > 0 else { return 0 }
+        let span = range.upperBound - range.lowerBound
+        guard span.isFinite, span > 0 else { return 0 }
+        let ratio = (value - range.lowerBound) / span
+        guard ratio.isFinite else { return 0 }
         return totalWidth * CGFloat(max(0, min(1, ratio)))
     }
 }
@@ -61,7 +65,7 @@ struct CustomSlider: View {
 // MARK: - Format Time Helper
 
 func formatTime(_ time: TimeInterval) -> String {
-    guard time.isFinite && !time.isNaN else { return "0:00" }
+    guard time.isFinite, !time.isNaN, time >= 0 else { return "0:00" }
     let minutes = Int(time) / 60
     let seconds = Int(time) % 60
     return String(format: "%d:%02d", minutes, seconds)

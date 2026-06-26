@@ -3,11 +3,10 @@ import SwiftUI
 struct LibraryView: View {
     @Environment(LibraryStore.self) private var library
     @Environment(PlayerViewModel.self) private var player
-    @State private var selectedTab: LibraryTab = .playlists
+    @State private var selectedTab: LibraryTab = .songs
     @State private var searchText: String = ""
     
     enum LibraryTab: String, CaseIterable {
-        case playlists = "Playlists"
         case albums = "Albums"
         case artists = "Artists"
         case songs = "Songs"
@@ -30,8 +29,6 @@ struct LibraryView: View {
                 // Content
                 Group {
                     switch selectedTab {
-                    case .playlists:
-                        PlaylistsView()
                     case .albums:
                         AlbumsGridView()
                     case .artists:

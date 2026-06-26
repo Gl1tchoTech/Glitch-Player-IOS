@@ -43,8 +43,36 @@ final class ThemeManager {
         }
     }
     
-    var themeMode: ThemeMode = .dark
-    var accentColor: AccentColor = .pink
+    var themeMode: ThemeMode {
+        didSet { save() }
+    }
+    
+    var accentColor: AccentColor {
+        didSet { save() }
+    }
+    
+    init() {
+        let defaults = UserDefaults.standard
+        if let rawMode = defaults.string(forKey: "theme_mode"),
+           let mode = ThemeMode(rawValue: rawMode) {
+            self.themeMode = mode
+        } else {
+            self.themeMode = .dark
+        }
+        
+        if let rawAccent = defaults.string(forKey: "accent_color"),
+           let accent = AccentColor(rawValue: rawAccent) {
+            self.accentColor = accent
+        } else {
+            self.accentColor = .pink
+        }
+    }
+    
+    private func save() {
+        let defaults = UserDefaults.standard
+        defaults.set(themeMode.rawValue, forKey: "theme_mode")
+        defaults.set(accentColor.rawValue, forKey: "accent_color")
+    }
     
     var colorScheme: ColorScheme? {
         switch themeMode {
@@ -52,19 +80,5 @@ final class ThemeManager {
         case .light: return .light
         case .dark: return .dark
         }
-    }
-    
-    var backgroundColor: Color {
-        themeMode == .dark ? Color(uiColor: .systemBackground) : Color(uiColor: .systemBackground)
-    }
-    
-    var secondaryBackground: Color {
-        themeMode == .dark ? Color(uiColor: .secondarySystemBackground) : Color(uiColor: .secondarySystemBackground)
-    }
-    
-    var isDarkMode: Bool {
-        if themeMode == .dark { return true }
-        if themeMode == .light { return false }
-        return UITraitCollection.current.userInterfaceStyle == .dark
     }
 }

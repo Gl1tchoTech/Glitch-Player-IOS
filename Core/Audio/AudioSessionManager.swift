@@ -11,7 +11,7 @@ final class AudioSessionManager {
             try session.setCategory(
                 .playback,
                 mode: .default,
-                policy: .longFormAudio,
+                policy: .default,
                 options: [.allowBluetooth, .allowBluetoothA2DP]
             )
             try session.setActive(true)

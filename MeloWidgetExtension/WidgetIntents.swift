@@ -10,7 +10,7 @@ struct PlayPauseIntent: AppIntent {
         let center = CFNotificationCenterGetDarwinNotifyCenter()
         CFNotificationCenterPostNotification(
             center,
-            CFNotificationName("com.meloplayer.widget.playpause" as CFString),
+            CFNotificationName("com.errorstream.widget.playpause" as CFString),
             nil, nil, true
         )
         return .result()
@@ -25,7 +25,7 @@ struct NextTrackIntent: AppIntent {
         let center = CFNotificationCenterGetDarwinNotifyCenter()
         CFNotificationCenterPostNotification(
             center,
-            CFNotificationName("com.meloplayer.widget.next" as CFString),
+            CFNotificationName("com.errorstream.widget.next" as CFString),
             nil, nil, true
         )
         return .result()
@@ -40,7 +40,7 @@ struct PreviousTrackIntent: AppIntent {
         let center = CFNotificationCenterGetDarwinNotifyCenter()
         CFNotificationCenterPostNotification(
             center,
-            CFNotificationName("com.meloplayer.widget.previous" as CFString),
+            CFNotificationName("com.errorstream.widget.previous" as CFString),
             nil, nil, true
         )
         return .result()

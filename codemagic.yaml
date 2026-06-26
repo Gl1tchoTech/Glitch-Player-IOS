@@ -2,7 +2,7 @@ workflows:
 
   # ── Unsigned IPA Build ────────────────────────────────────────────
   meloplayer-build:
-    name: MeloPlayer Build
+    name: ErrorStream Build
     max_build_duration: 120
     instance_type: mac_mini_m2
     environment:
@@ -42,8 +42,8 @@ workflows:
           fi
           cp -R "$APP" "$CM_BUILD_DIR/build/ios/ipa/Payload/"
           cd "$CM_BUILD_DIR/build/ios/ipa"
-          zip -r MeloPlayerClone.ipa Payload
-          echo "[OK] IPA created: $(wc -c < MeloPlayerClone.ipa) bytes"
+          zip -r ErrorStream.ipa Payload
+          echo "[OK] IPA created: $(wc -c < ErrorStream.ipa) bytes"
     artifacts:
       - build/ios/ipa/*.ipa
       - build/ios/xcarchive/*.xcarchive

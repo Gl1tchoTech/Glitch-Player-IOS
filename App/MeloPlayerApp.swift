@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct MeloPlayerApp: App {
+struct ErrorStreamApp: App {
     
     // MARK: - State Objects
     

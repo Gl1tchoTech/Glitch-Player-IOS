@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BrowseView: View {
     @Environment(BrowseViewModel.self) private var viewModel
+    @Environment(PlayerViewModel.self) private var player
     @State private var selectedTab: BrowseTab = .trending
     
     enum BrowseTab: String, CaseIterable {
@@ -14,14 +15,27 @@ struct BrowseView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Tab picker
-                Picker("Browse", selection: $selectedTab) {
-                    ForEach(BrowseTab.allCases, id: \.self) { tab in
-                        Text(tab.rawValue).tag(tab)
+                // Pill picker
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(BrowseTab.allCases, id: \.self) { tab in
+                            Button(action: { selectedTab = tab }) {
+                                Text(tab.rawValue)
+                                    .font(.system(size: 13, weight: selectedTab == tab ? .semibold : .medium))
+                                    .foregroundColor(selectedTab == tab ? .white : .secondary)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        selectedTab == tab
+                                            ? Color.pink
+                                            : Color.gray.opacity(0.12)
+                                    )
+                                    .clipShape(Capsule())
+                            }
+                        }
                     }
+                    .padding(.horizontal, 16)
                 }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 
                 // Content
@@ -55,7 +69,13 @@ struct BrowseView: View {
                 LazyVStack(spacing: 0) {
                     ForEach(viewModel.trendingTracks) { apiTrack in
                         let track = apiTrack.toTrack()
-                        BrowseTrackRow(apiTrack: apiTrack, track: track)
+                        let tracks = viewModel.trendingTracks.map { $0.toTrack() }
+                        TrackRowView(track: track, onTap: {
+                            player.play(track: track, queue: tracks,
+                                        startIndex: viewModel.trendingTracks.firstIndex(where: { $0.id == track.id }) ?? 0)
+                        }, onDownload: {
+                            viewModel.downloadTrack(apiTrack)
+                        })
                         Divider()
                             .padding(.leading, 72)
                             .opacity(0.4)
@@ -86,10 +106,10 @@ struct BrowseView: View {
                                 switch phase {
                                 case .success(let image):
                                     image.resizable().aspectRatio(1, contentMode: .fill)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .clipShape(RoundedRectangle(cornerRadius: 14))
                                         .shadow(color: .black.opacity(0.1), radius: 6, y: 3)
                                 default:
-                                    RoundedRectangle(cornerRadius: 12)
+                                    RoundedRectangle(cornerRadius: 14)
                                         .fill(.gray.opacity(0.1))
                                         .aspectRatio(1, contentMode: .fill)
                                         .overlay(
@@ -138,10 +158,10 @@ struct BrowseView: View {
                                 switch phase {
                                 case .success(let image):
                                     image.resizable().aspectRatio(1, contentMode: .fill)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .clipShape(RoundedRectangle(cornerRadius: 14))
                                         .shadow(color: .black.opacity(0.1), radius: 6, y: 3)
                                 default:
-                                    RoundedRectangle(cornerRadius: 12)
+                                    RoundedRectangle(cornerRadius: 14)
                                         .fill(.gray.opacity(0.1))
                                         .aspectRatio(1, contentMode: .fill)
                                         .overlay(
@@ -186,18 +206,3 @@ struct BrowseView: View {
     }
 }
 
-struct BrowseTrackRow: View {
-    let apiTrack: APITrack
-    let track: Track
-    @Environment(PlayerViewModel.self) private var player
-    @Environment(BrowseViewModel.self) private var viewModel
-    
-    var body: some View {
-        TrackRowView(track: track, onTap: {
-            player.play(track: track, queue: viewModel.trendingTracks.map { $0.toTrack() },
-                        startIndex: viewModel.trendingTracks.firstIndex(where: { $0.id == track.id }) ?? 0)
-        }, onDownload: {
-            viewModel.downloadTrack(apiTrack)
-        })
-    }
-}

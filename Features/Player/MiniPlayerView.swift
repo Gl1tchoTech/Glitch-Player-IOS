@@ -103,7 +103,9 @@ struct MiniPlayerView: View {
     }
     
     private func progressWidth(in totalWidth: CGFloat) -> CGFloat {
-        guard player.duration > 0 else { return 0 }
-        return totalWidth * CGFloat(player.currentTime / player.duration)
+        guard player.duration > 0, totalWidth.isFinite, totalWidth > 0 else { return 0 }
+        let ratio = player.currentTime / player.duration
+        guard ratio.isFinite else { return 0 }
+        return totalWidth * CGFloat(max(0, min(1, ratio)))
     }
 }

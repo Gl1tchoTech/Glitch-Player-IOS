@@ -24,7 +24,7 @@ final class DownloadManager: NSObject {
     
     override init() {
         super.init()
-        let config = URLSessionConfiguration.background(withIdentifier: "com.meloplayer.downloads")
+        let config = URLSessionConfiguration.background(withIdentifier: "com.errorstream.downloads")
         config.isDiscretionary = false
         config.sessionSendsLaunchEvents = true
         config.allowsCellularAccess = true

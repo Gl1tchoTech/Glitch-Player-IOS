@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(ThemeManager.self) private var theme
+    @Environment(PlayerViewModel.self) private var player
     
     var body: some View {
         NavigationStack {
@@ -23,9 +24,9 @@ struct SettingsView: View {
                     )) {
                         ForEach(ThemeManager.AccentColor.allCases) { accent in
                             HStack {
-                                Circle()
+                                Capsule()
                                     .fill(accent.color)
-                                    .frame(width: 18, height: 18)
+                                    .frame(width: 24, height: 12)
                                 Text(accent.rawValue)
                             }
                             .tag(accent)
@@ -37,7 +38,10 @@ struct SettingsView: View {
                 
                 // Playback
                 Section {
-                    Toggle("Gapless Playback", isOn: .constant(true))
+                    Toggle("Gapless Playback", isOn: Binding(
+                        get: { player.gaplessEnabled },
+                        set: { player.gaplessEnabled = $0 }
+                    ))
                     
                     HStack {
                         Text("Crossfade")
@@ -66,7 +70,9 @@ struct SettingsView: View {
                     }
                     
                     Button("Clear Downloads") {
-                        // Implement clear downloads
+                        for file in DownloadManager.shared.allDownloadedFiles() {
+                            try? FileManager.default.removeItem(at: file)
+                        }
                     }
                     .foregroundColor(.red)
                 } header: {
@@ -76,12 +82,12 @@ struct SettingsView: View {
                 // Sleep Timer
                 Section {
                     NavigationLink {
-                        SleepTimerSettingView()
+                        SleepTimerDefaultView()
                     } label: {
                         HStack {
                             Label("Default Timer", systemImage: "moon.zzz")
                             Spacer()
-                            Text("Off")
+                            Text(sleepTimerLabel)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -99,49 +105,72 @@ struct SettingsView: View {
                     }
                     
                     HStack {
-                        Text("Build")
+                        Text("API")
                         Spacer()
-                        Text("Glitchi-Stream API")
+                        Text("Glitchi-Stream")
                             .foregroundColor(.secondary)
                     }
                 } header: {
                     Text("About")
                 } footer: {
-                    Text("MeloPlayer Clone — Stream and download music via the Glitchi-Stream API.")
+                    Text("ErrorStream — Stream and download music via the Glitchi-Stream API.")
                 }
             }
             .navigationTitle("Settings")
         }
     }
+    
+    private var sleepTimerLabel: String {
+        let mins = player.sleepTimerMinutes
+        if mins == 0 { return "Off" }
+        if mins < 60 { return "\(mins) min" }
+        return "\(mins / 60)h \(mins % 60)m"
+    }
 }
 
-struct SleepTimerSettingView: View {
+// MARK: - Sleep Timer Default
+
+struct SleepTimerDefaultView: View {
+    @Environment(PlayerViewModel.self) private var player
+    @Environment(\.dismiss) private var dismiss
+    
+    let options: [(Int, String)] = [
+        (0, "Off"),
+        (5, "5 minutes"),
+        (10, "10 minutes"),
+        (15, "15 minutes"),
+        (30, "30 minutes"),
+        (45, "45 minutes"),
+        (60, "1 hour"),
+        (90, "90 minutes"),
+        (120, "2 hours"),
+    ]
+    
     var body: some View {
-        Form {
+        List {
             Section {
-                Text("Set a default sleep timer to automatically stop playback.")
-                    .font(.system(size: 14))
-                    .foregroundColor(.secondary)
-            }
-            
-            Section {
-                ForEach([0, 5, 10, 15, 30, 45, 60], id: \.self) { minutes in
-                    HStack {
-                        if minutes == 0 {
-                            Text("Off")
-                        } else if minutes < 60 {
-                            Text("\(minutes) minutes")
-                        } else {
-                            Text("1 hour")
+                ForEach(options, id: \.0) { mins, label in
+                    Button(action: {
+                        player.setSleepTimer(minutes: mins)
+                        dismiss()
+                    }) {
+                        HStack {
+                            Text(label)
+                                .foregroundColor(.primary)
+                            Spacer()
+                            if player.sleepTimerMinutes == mins {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.pink)
+                                    .font(.system(size: 14, weight: .semibold))
+                            }
                         }
-                        Spacer()
-                        Image(systemName: "checkmark")
-                            .foregroundColor(.pink)
-                            .opacity(0) // Placeholder
                     }
                 }
+            } header: {
+                Text("Stop music after...")
             }
         }
         .navigationTitle("Sleep Timer")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
